@@ -1,0 +1,777 @@
+@charset "UTF-8";
+
+/*共通部分*/
+html {
+  font-size: 100%;
+}
+
+body {
+  font-family:
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", sans-serif;
+  line-height: 1.7;
+  color: #432;
+}
+
+a {
+  text-decoration: none;
+}
+.slide-img {
+  display: none;
+}
+img {
+  max-width: 100%;
+}
+body {
+  margin: 0;
+  overflow-x: hidden; /* 横スクロールバーの発生を防ぐ */
+}
+
+#drop-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* クリック操作を邪魔しない */
+  z-index: 9999;
+}
+
+.falling-image {
+  position: absolute;
+  /* top は JS でランダムな位置に指定するため、ここでは固定しません */
+  animation: twinkle linear forwards; /* 1回だけアニメーションして消える */
+}
+
+@keyframes twinkle {
+  0% {
+    transform: scale(0); /* 最初はサイズ0 */
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1); /* 最大サイズになり、はっきり見える */
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0); /* 最後はまた小さくなって消える */
+    opacity: 0;
+  }
+}
+
+/*レイアウト*/
+.wrapper {
+  max-width: 1120px;
+  margin: auto;
+  padding: 0 1.5rem;
+}
+.align-center {
+  text-align: center;
+}
+
+/*見出し*/
+.font-english {
+  font-family: "Kaisei Decol", sans-serif;
+  font-weight: normal;
+}
+.page-title,
+.heading-large {
+  font-size: 3.5rem;
+  text-align: center;
+}
+.page-title {
+  margin-top: 8rem;
+  line-height: 1.4;
+}
+.heading-large {
+  margin-bottom: 1rem;
+}
+/* Aboutの下の文章の見た目を調整する */
+.about-text {
+  font-size: 14px;
+  line-height: 1.9;
+}
+/*ボタン*/
+.btn {
+  display: inline-block;
+  padding: 16px 45px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #6a4d42; /* 上品なブラウングレーの文字色 */
+  text-decoration: none;
+  border-radius: 50px; /* 完全なカプセル型 */
+  cursor: pointer;
+
+  /* --- ちゅるん感のコア設定 --- */
+  /* ベースは透明感のあるコーラルピンクのグラデーション */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 200, 185, 0.4) 0%,
+    rgba(240, 160, 140, 0.5) 100%
+  );
+
+  /* ガラスのようなすりガラス効果 */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* ぷるんとしたハイライト（白い光の枠線） */
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+
+  /* 複雑な影の組み合わせ */
+  box-shadow:
+    0 8px 20px rgba(240, 160, 140, 0.15),
+    /* 外側のふんわりした影 */ inset 0 4px 6px rgba(255, 255, 255, 0.9),
+    /* 内側上部の強いツヤ光 */ inset 0 -4px 10px rgba(240, 160, 140, 0.3); /* 内側下部のとろみ感 */
+
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 200, 185, 0.6) 0%,
+    rgba(240, 160, 140, 0.7) 100%
+  );
+  box-shadow:
+    0 10px 25px rgba(240, 160, 140, 0.25),
+    inset 0 6px 8px rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px); /* ぷにっと浮く動き */
+}
+.btn-menu {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: rgb(7, 7, 7);
+  padding: 0.5rem 1rem;
+}
+
+#scrollTopBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: none;
+
+  /* --- 「ちゅるん」質感の調整 --- */
+  padding: 12px 20px;
+  border-radius: 50px; /* カプセル型にして丸みをもたせる */
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+
+  /* 背景を半透明（クリア）にする */
+  background: rgba(255, 255, 255, 0.4);
+
+  /* 文字や矢印の色（お好みで変えてね） */
+  color: #555555;
+
+  /* 背景をぼかす、ガラスのような透明感 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  /* ぷるんとしたツヤ感を出すための、うっすら白いハイライト（枠線） */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* 水っぽいぷるぷる感を出すための立体的な影 */
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.05),
+    /* 全体のふんわりした影 */ inset 0 2px 4px rgba(255, 255, 255, 0.7); /* 内側のツヤ（光） */
+
+  /* なめらかに変化させる */
+  transition: all 0.3s ease;
+}
+
+/* ホバー（マウスを乗せたとき）の演出 */
+#scrollTopBtn:hover {
+  background: rgba(255, 255, 255, 0.6); /* 少し不透明度を上げて白く */
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    inset 0 4px 6px rgba(255, 255, 255, 0.9); /* 内側のツヤを強調 */
+  transform: translateY(-2px); /* ぷにっと少し上に浮く動き */
+}
+/*ヘッダー*/
+.page-header {
+  padding-top: 0.5rem;
+}
+
+.logo {
+  width: 210px;
+}
+
+.main-nav {
+  width: 0;
+  position: absolute;
+  top: 25px;
+  right: 0;
+  overflow: hidden;
+  transition: 0.5s;
+  display: block;
+}
+.main-nav li {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.main-nav.open-menu {
+  width: 110px;
+}
+
+.main-nav a {
+  color: #432;
+}
+.main-nav a:hover {
+  color: rgb(255, 82, 139);
+}
+
+.cover {
+  background-size: cover;
+  background-position: center bottom;
+  height: 900px;
+}
+.cover-home {
+  background-image: url(images/メインバナー縦2.jpg);
+}
+.about {
+  max-width: 736px;
+  padding: 0 1.5rem;
+  margin: 3rem auto 0;
+}
+.about p {
+  margin-bottom: 3rem;
+}
+
+/*Menu*/
+.menu-category {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 2rem; /* 👈 マイナスを消してプラスに直しました！これで重なりが直ります */
+  margin-bottom: 2rem;
+}
+
+.cover-menu {
+  background-image: url(images/menu-ヘッダー.jpg); /* ※実際のファイル名に合わせてね */
+  background-size: cover;
+  background-position: center;
+  height: auto; /* 900pxの固定高さを解除 */
+
+  padding-top: 0; /* 上の余白を0に！これでホームとロゴが1ミリもズレなくなります */
+  padding-bottom: 5rem; /* 👈 ここを5remに縮めることで、大文字Menuの下の空きすぎを解決します */
+}
+
+.grid {
+  display: grid;
+  gap: 2rem 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  text-align: center;
+}
+
+.item img {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.item p {
+  font-size: 0.8em;
+}
+/* 文字だけメニュー全体の幅と左右の余白 */
+.text-menu-list {
+  max-width: 600px; /* 好みに応じて、400px〜600pxくらいで調整してください */
+  margin: 0 auto 5rem auto; /* リストの下に次のカテゴリとの隙間を作る */
+  padding: 0 1.5rem; /* スマホの画面端にくっつきすぎないためのクッション */
+}
+
+/* メニュー名と金額を左右の両端に引っ張る */
+.text-menu-item {
+  display: flex;
+  justify-content: space-between; /* これで左と右に綺麗に別れます */
+  align-items: flex-start; /* メニュー名が長くて改行されても上に揃える */
+  gap: 1rem; /* 文字同士がくっつきすぎない隙間 */
+  padding: 1.2rem 0; /* メニューごとの上下のゆったりした隙間 */
+  border-bottom: 1px dashed #e5d8d0; /* 下側に薄いピンクベージュの点線を敷く */
+}
+
+/* メニュー名の文字サイズ */
+.menu-name {
+  font-size: 0.9rem;
+  color: #432; /* 元のサイトで使われている文字色に合わせる */
+  text-align: left;
+}
+
+/* 金額・時間の文字サイズと太さ */
+.menu-price {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #5c4033; /* 金額を少しだけ濃いブラウンにして引き締める */
+  white-space: nowrap; /* 金額が途中で変に改行されるのを防ぐ */
+  text-align: right;
+}
+
+/*Reservation*/
+.cover-reservation {
+  background-image: url(images/menu-ヘッダー.jpg); /* ※実際のファイル名に合わせてね */
+  background-size: cover;
+  background-position: center;
+  height: auto; /* 900pxの固定高さを解除 */
+
+  padding-top: 0; /* 上の余白を0に！これでホームとロゴが1ミリもズレなくなります */
+  padding-bottom: 5rem; /* 👈 ここを5remに縮めることで、大文字Menuの下の空きすぎを解決します */
+}
+.reservation-title-area {
+  text-align: center;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+.reservation-title-area p {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #5c4033;
+  letter-spacing: 1px;
+}
+.reservation-info {
+  padding: 0 1.9rem;
+  text-align: center;
+}
+.reservation-info a {
+  margin: 20px 0 40px;
+}
+.reservation-info > p:first-of-type {
+  font-size: 0.8rem;
+  line-height: 1.8; /* 行の間隔をゆったり広げて読みやすく */
+  color: #432e25;
+  margin-bottom: 2.5rem;
+}
+.reservation-info .policy-title {
+  font-size: 1.2rem;
+  font-weight: bold; /* 太字にしてしっかり見出しに */
+  color: #5c4033;
+  letter-spacing: 1px;
+
+  /*上のボタンとの間にガバッと上品な余白を作ります */
+  margin-top: 6rem !important; /* ボタンとの間の上の余白をたっぷり確保 */
+  margin-bottom: 2rem; /* 下の説明文とのすき間 */
+}
+
+/* 各注意事項の説明文（キャンセルについて、遅刻について） */
+.reservation-info p:not(:first-of-type):not(.policy-title) {
+  font-size: 1rem;
+  color: #555555; /* 優しいダークグレー */
+  line-height: 1.8; /* 2行になっても重ならないようにゆったり */
+  text-align: left; /* ⚠️ 長い説明文は左に揃えた方が圧倒的に読みやすくなります */
+  margin-bottom: 2rem; /* 項目ごとのすき間 */
+}
+
+/* 「■ キャンセルについて」などの見出し文字（strong） */
+.reservation-info p strong {
+  display: block; /* タイトル部分で自動的に改行させる */
+  color: #a67c52; /* ゴールド系の優しいブラウン */
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem; /* 下の本文とのすき間 */
+}
+
+/*フッター*/
+.page-footer {
+  background-image: url(images/フッター.jpg);
+  padding-top: 12rem;
+}
+.info th {
+  padding-left: 2.5rem;
+}
+.info {
+  -webkit-text-stroke: 3px #ffffff; /* フチの【太さ】と【色】 */
+  paint-order: stroke fill; /* 文字が潰れないようにするおまじない */
+  /* --- ここまで書き足す --- */
+}
+/*CONTACT*/
+.cover-contact {
+  background-image: url(images/menu-ヘッダー.jpg); /* ※実際のファイル名に合わせてね */
+  background-size: cover;
+  background-position: center;
+  height: auto; /* 900pxの固定高さを解除 */
+
+  padding-top: 0; /* 上の余白を0に！これでホームとロゴが1ミリもズレなくなります */
+  padding-bottom: 5rem; /* 👈 ここを5remに縮めることで、大文字Menuの下の空きすぎを解決します */
+}
+
+/*店舗情報*/
+.location {
+  margin-bottom: 3.5rem;
+}
+.location-info {
+  margin-bottom: 2rem;
+}
+.location-info .info {
+  padding: 0;
+}
+/*iframe*/
+iframe {
+  width: 100%;
+}
+/*お問い合わせ*/
+.email {
+  max-width: 916px;
+  background-color: #faf7f0;
+  border-radius: 48px;
+  padding: 1.5rem 2.5rem 2.5rem;
+  margin: 0 auto 2rem;
+}
+.email p {
+  margin: 1rem 0 2rem;
+}
+
+/*フッター*/
+.page-footer {
+  background-image: url(images/フッター.jpg);
+  background-size: cover;
+  background-position: center;
+  padding: 12rem 0 0 0;
+}
+.info {
+  width: 100%;
+  max-width: 544px;
+  margin: auto;
+  padding: 0 1.5rem;
+  border-spacing: 0;
+}
+.info th,
+.info td {
+  border-bottom: 1px solid #c9c2bc;
+}
+.info th {
+  text-align: left;
+  font-weight: normal;
+  padding: 1rem;
+}
+.info td {
+  padding: 1rem 0;
+}
+.coppyright {
+  background-color: #432;
+  text-align: center;
+  padding: 2rem 0;
+  margin-top: 6rem;
+  color: #fff;
+}
+.falling-item {
+  position: fixed;
+  top: -50px; /* 最初は画面の上の見えない場所にセット */
+  z-index: 9999; /* 他の文字や箱より手前に表示させる */
+  pointer-events: none; /* 画像が邪魔でボタンが押せなくなるのを防ぐ */
+  animation: fallAnimation linear forwards;
+}
+
+/*デスクトップ版*/
+@media (min-width: 800px) {
+  /*見出し*/
+  .page-title {
+    font-size: 5rem;
+  }
+  .heading-large {
+    font-size: 4rem;
+  }
+
+  /*ヘッダー*/
+  .page-header {
+    display: flex !important;
+    justify-content: space-between !important; /* 左にロゴ、右にメニューリンク */
+    align-items: center !important; /* 縦方向の中心線を揃える */
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 1.5rem 4% !important; /* 左右に4%の程よい余白 */
+    margin: 0 !important;
+  }
+  .page-header h1.align-center {
+    margin: 0 !important;
+    text-align: left !important;
+    flex: 0 0 auto !important;
+  }
+  .logo {
+    height: 40px !important; /* お好みの高さに調整してください */
+    width: auto !important;
+    display: block;
+  }
+  .btn-menu,
+.btn-close, /* もしCloseボタンに別のクラス名があればそれも（一旦推測で入れてます） */
+header nav button {
+    display: none !important;
+  }
+  .main-nav {
+    display: flex !important; /* 縦並びから「横並び」に強制変更 */
+    list-style: none !important; /* 箇条書きの点を消す */
+    gap: 30px !important; /* Menu, Reservation, Contact の間の余白 */
+    margin: 0 !important;
+    padding: 0 !important;
+
+    /* スマホ版の「ボタンを押したら出てくる暗幕やスライド」の指示をすべてPC版で無効化 */
+    position: static !important; /* 画面右側に固定されていたのを解除 */
+    opacity: 1 !important; /* 強制表示 */
+    visibility: visible !important; /* 強制表示 */
+    transform: none !important; /* 画面外へのスライドを解除 */
+    background: transparent !important; /* スマホ用メニューの背景色を消して透明に */
+    width: auto !important;
+    height: auto !important;
+  }
+  .main-nav li {
+    margin: 0 !important;
+  }
+  .main-nav a {
+    text-decoration: none;
+    font-size: 1.8rem; /* 文字の大きさを調整 */
+    white-space: nowrap !important; /* 文字が途中で改行されるのを防ぐ */
+  }
+
+  /*フッター*/
+  .page-footer {
+    background-image: url(images/フッター横.jpg);
+    padding-top: 12rem;
+  }
+
+  .info th {
+    padding-left: 2.5rem;
+  }
+
+  /*HOME*/
+  .cover-home {
+    background-image: url(images/メインバナー.jpg);
+  }
+  .about {
+    margin: 4rem auto 0;
+  }
+  .about-text {
+    text-align: center;
+    font-size: 20px;
+  }
+  header.page-header.wrapper {
+    display: flex !important;
+    justify-content: space-between !important; /* 左にロゴ、右にメニュー */
+    align-items: center !important;
+    width: 100% !important;
+    max-width: none !important; /* 横幅制限を解除 */
+    margin: 0 !important; /* 左寄せに固定 */
+    padding: 2rem 4% 0 4% !important; /* 左右に4%の余白を作る */
+    box-sizing: border-box !important;
+  }
+
+  /* 2. 左のロゴ：これまでの absolute などを全て消し、左側で大人しくさせます */
+  .cover-home .align-center {
+    position: static !important; /* absoluteを解除 */
+    margin: 0 !important; /* 中央寄せのmarginをリセット */
+    text-align: left !important; /* 左寄せ */
+    transform: none !important; /* 中央移動を解除 */
+    width: auto !important;
+  }
+
+  /* 3. 右のメニューボタン：こちらも absolute を消し、右側で大人しくさせます */
+  .cover-home .btn-menu {
+    position: static !important; /* absoluteを解除 */
+    margin: 0 !important;
+    transform: none !important;
+    font-size: 1.5rem;
+  }
+
+  .about .wrapper {
+    position: relative !important;
+  }
+  /* Aboutエリアを基準にする */
+  .about {
+    position: relative !important;
+  }
+
+  .about-sideshow-container {
+    display: none !important;
+  }
+
+  /* ==========================================================
+   Aboutのスライドショー（PC版復活・スマホ版は非表示）
+   ========================================================== */
+
+  /* 1. 【スマホ用の設定】画面が1350pxより狭いときは、写真を枠ごと完全に消す */
+  @media (max-width: 1350px) {
+    .about-sideshow-container {
+      display: none !important;
+    }
+  }
+
+  /* 2. 【PC用の設定】画面が1350px以上の広いパソコンのときだけ、写真を出して動かす */
+  @media (min-width: 1350px) {
+    .about {
+      position: relative !important;
+    }
+
+    /* パソコンの時は写真の枠をしっかり表示 */
+    .about-sideshow-container {
+      display: block !important;
+    }
+
+    .nail-slideshow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 240px; /* 写真の横幅 */
+      height: 360px; /* 写真の縦幅 */
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 左側の写真の位置 */
+    .left-side {
+      left: calc(50% - 550px);
+    }
+
+    /* 右側の写真の位置 */
+    .right-side {
+      left: calc(50% + 300px);
+    }
+
+    /* 写真を重ねてアニメーションさせる */
+    .nail-slideshow .slide-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: slideLeftToRight 12s linear infinite;
+    }
+
+    .nail-slideshow .slide-img:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .nail-slideshow .slide-img:nth-child(2) {
+      animation-delay: 4s;
+    }
+    .nail-slideshow .slide-img:nth-child(3) {
+      animation-delay: 8s;
+    }
+  }
+
+  /* アニメーションの動き */
+  @keyframes slideLeftToRight {
+    0% {
+      transform: translateX(-100%);
+    }
+    8% {
+      transform: translateX(0);
+    }
+    33% {
+      transform: translateX(0);
+    }
+    41% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  /*Menu*/
+  .cover-menu {
+    background-image: url(images/menu-ヘッダー横.jpg);
+  }
+  .grid {
+    gap: 3rem 2rem;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .item img {
+    margin-bottom: 0.5rem;
+  }
+  .item p {
+    font-size: 1rem;
+  }
+  /*contact*/
+  .cover-contact {
+    background-image: url(images/menu-ヘッダー横.jpg);
+  }
+  .location {
+    display: flex;
+    gap: 2rem;
+  }
+  .location-info {
+    width: 32%;
+  }
+  .location-info .info th {
+    padding-left: 2rem;
+  }
+  .location-map {
+    width: 64%;
+  }
+  .email {
+    margin-bottom: 4rem;
+  }
+  .sns {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 0;
+  }
+  .sns-item {
+    flex: 1;
+  }
+  section.email br.sp-only {
+    display: none !important;
+  }
+
+  /* 💡 2. PC用の改行（pc-only）をしっかり有効化して改行させる */
+  section.email br.pc-only {
+    display: inline !important;
+  }
+
+  /* 💡 3. 本文：左揃えのまま、文章の塊ごとド真ん中へ配置する */
+  section.email > p {
+    text-align: left !important; /* 文字の頭は左で揃える */
+    display: table !important; /* 文字の長さに合わせた「箱」にする */
+    margin: 0 auto 3rem auto !important; /* 左右の余白をautoにして中央へ引っ張る */
+    max-width: 690px !important; /* PCで横に広がりすぎないように制限 */
+    line-height: 2 !important; /* ゆったり読みやすい行間 */
+  }
+
+  /*reservation*/
+  .cover-reservation {
+    background-image: url(images/menu-ヘッダー横.jpg);
+  }
+  .reservation-info p br.sp-only {
+    display: none;
+  }
+
+  /* ==========================================================
+   予約ページの文章を横長にしつつ、グループごと中央に寄せる
+   ========================================================== */
+
+  /* 1. 文章が入っている箱（reservation-info）自体を広げて真ん中に寄せる */
+  .reservation-info {
+    max-width: 750px !important; /* 読みやすい横幅に制限 */
+    width: 90% !important;
+    margin-left: auto !important; /* 左右の余白を自動調整して */
+    margin-right: auto !important; /* グループ全体を画面の真ん中に配置 */
+  }
+
+  /* 2. 中にあるすべての文章（pタグ）の幅を100%にして左揃えにする */
+  .reservation-info p {
+    max-width: 100% !important;
+    width: 100% !important;
+    text-align: left !important; /* 文章の書き出しは左に揃えて読みやすく */
+  }
+
+  /* 3. 「ご予約について」と「注意事項」の見出しだけを単体で真ん中揃えにする */
+  .reservation-info p:first-of-type,
+  .policy-title {
+    text-align: center !important; /* 見出しはビシッと真ん中揃え */
+  }
+
+  /* 4. 見出しの上下に程よい隙間を作る */
+  .policy-title {
+    margin-top: 60px !important; /* ボタンとの間隔 */
+    margin-bottom: 30px !important; /* 下の文章との間隔 */
+  }
+
+  .slide-img {
+    display: block;
+  }
+}
+/* ========================================================
+   【スマホ版（基本設定）】PC用の改行がスマホで悪さしないように隠す
+   ======================================================== */
+/* ⚠️ @mediaの「外（下）」の一番最後にこれを1行だけ足してください */
+section.email br.pc-only {
+  display: none;
+}
